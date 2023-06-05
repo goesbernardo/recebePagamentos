@@ -1,0 +1,49 @@
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+
+
+spring:
+  datasource:
+    hikari:
+      connection-test-query: SELECT 1
+      minimum-idle: 1
+      maximum-pool-size: 10
+      pool-name: plataforma-database-tool
+      auto-commit: false
+      connection-timeout: 30000
+      jdbc-url: "jdbc:postgresql://0.0.0.0:5432/recebepagamentos_db"
+      username: postgres
+      password: admin
+    url: "jdbc:postgresql://0.0.0.0:5432/recebepagamentos_db"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database: postgresql
+    generate-ddl: true
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    stream:
+      username: guest
+      password: guest
+
+
+  jaeger:
+    enabled: true
+    log-spans: true
+    udp-sender:
+      host: jaeger
+      port: 6831
+    const-sampler:
+      decision: true
+    service-name: recebepagamentos
