@@ -4,6 +4,7 @@ server:
     include-stacktrace: never
 
 
+
 spring:
   datasource:
     hikari:
@@ -19,15 +20,18 @@ spring:
     url: "jdbc:postgresql://0.0.0.0:5432/recebepagamentos_db"
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     database: postgresql
     generate-ddl: true
 
+
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+
+
 
 
   rabbitmq:
@@ -47,3 +51,7 @@ spring:
     const-sampler:
       decision: true
     service-name: recebepagamentos
+
+springdoc:
+  api-docs:
+    enabled: true
