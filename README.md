@@ -26,13 +26,9 @@ Instruções básicas para subir o contexto da aplicação :
 
 Segue abaixo body de requisição ao serviço : 
 
-{
-  "id": 5,
-  "valor": 40,
-  "status": "ENVIADO",
-  "formaPagamento": "CARTAO_CREDITO",
-	"tipoBandeira": "VISA"
-}	
+![img_1.png](img_1.png)
+
+
 	
 
 
