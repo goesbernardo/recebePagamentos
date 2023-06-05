@@ -32,6 +32,11 @@ Segue abaixo desenho técnico da solução proposta :
 
 ![img_2.png](img_2.png)
 
+Demonstrativo de cobertura de testes : 
+
+![img_3.png](img_3.png)
+
+
 
 	
 

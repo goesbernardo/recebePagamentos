@@ -2,42 +2,82 @@ package com.goesbernardo.processapagamentos.service.impl;
 
 import com.goesbernardo.processapagamentos.domain.FormaPagamento;
 import com.goesbernardo.processapagamentos.domain.Status;
+import com.goesbernardo.processapagamentos.domain.TipoBandeira;
 import com.goesbernardo.processapagamentos.dto.ProcessaPagamentoDTO;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import com.goesbernardo.processapagamentos.repository.PagamentoRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-public class PagamentoServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class PagamentoServiceImplTest {
+
     @Mock
-    RabbitTemplate rabbitTemplate;
+    private RabbitTemplate mockRabbitTemplate;
+    @Mock
+    private PagamentoRepository mockPagamentoRepository;
+    @Mock
+    private ModelMapper mockModelMapper;
+
     @InjectMocks
-    PagamentoServiceImpl pagamentoServiceImpl;
-
-    @Mock
-    ProcessaPagamentoDTO pagamentoDTO;
+    private PagamentoServiceImpl pagamentoServiceImplUnderTest;
 
 
+    @Test
+    void testEfetuaPagamento_RabbitTemplateConvertAndSendThrowsAmqpException() {
+        // Setup
+        final ProcessaPagamentoDTO recebePagamentoDTO = new ProcessaPagamentoDTO();
+        recebePagamentoDTO.setId(0L);
+        recebePagamentoDTO.setValor(0.0);
+        recebePagamentoDTO.setStatus(Status.ENVIADO);
+        recebePagamentoDTO.setFormaPagamento(FormaPagamento.CARTAO_CREDITO);
+        recebePagamentoDTO.setTipoBandeira(TipoBandeira.VISA);
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        // Configure RabbitTemplate.convertAndSend(...).
+        final ProcessaPagamentoDTO object = new ProcessaPagamentoDTO();
+        object.setId(0L);
+        object.setValor(0.0);
+        object.setStatus(Status.ENVIADO);
+        object.setFormaPagamento(FormaPagamento.CARTAO_CREDITO);
+        object.setTipoBandeira(TipoBandeira.VISA);
+        doThrow(AmqpException.class).when(mockRabbitTemplate).convertAndSend("pagamento.efetuado", object);
+
+        // Run the test
+        assertThatThrownBy(() -> pagamentoServiceImplUnderTest.efetuaPagamento(recebePagamentoDTO))
+                .isInstanceOf(AmqpException.class);
     }
 
     @Test
-    public void testEfetuaPagamento() throws Exception {
-        pagamentoDTO.setId(anyLong());
-        pagamentoDTO.setFormaPagamento(FormaPagamento.CARTAO_CREDITO);
-        pagamentoDTO.setValor(anyDouble());
-        pagamentoDTO.setStatus(Status.ENVIADO);
+    void testEfetuaPagamento_RabbitTemplateReceiveAndConvertThrowsAmqpException() {
+        // Setup
+        final ProcessaPagamentoDTO recebePagamentoDTO = new ProcessaPagamentoDTO();
+        recebePagamentoDTO.setId(0L);
+        recebePagamentoDTO.setValor(0.0);
+        recebePagamentoDTO.setStatus(Status.ENVIADO);
+        recebePagamentoDTO.setFormaPagamento(FormaPagamento.CARTAO_CREDITO);
+        recebePagamentoDTO.setTipoBandeira(TipoBandeira.VISA);
 
-        ProcessaPagamentoDTO result = pagamentoServiceImpl.efetuaPagamento(pagamentoDTO);
-        Assert.assertNotNull(result);
+        when(mockRabbitTemplate.receiveAndConvert("pagamento.processado")).thenThrow(AmqpException.class);
+
+        // Run the test
+        assertThatThrownBy(() -> pagamentoServiceImplUnderTest.efetuaPagamento(recebePagamentoDTO))
+                .isInstanceOf(AmqpException.class);
+
+        // Confirm RabbitTemplate.convertAndSend(...).
+        final ProcessaPagamentoDTO object = new ProcessaPagamentoDTO();
+        object.setId(0L);
+        object.setValor(0.0);
+        object.setStatus(Status.ENVIADO);
+        object.setFormaPagamento(FormaPagamento.CARTAO_CREDITO);
+        object.setTipoBandeira(TipoBandeira.VISA);
+        verify(mockRabbitTemplate).convertAndSend("pagamento.efetuado", object);
     }
 }
-

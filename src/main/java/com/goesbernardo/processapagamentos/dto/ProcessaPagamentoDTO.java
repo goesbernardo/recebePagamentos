@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.goesbernardo.processapagamentos.domain.FormaPagamento;
 import com.goesbernardo.processapagamentos.domain.Status;
 import com.goesbernardo.processapagamentos.domain.TipoBandeira;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.EnumType;
