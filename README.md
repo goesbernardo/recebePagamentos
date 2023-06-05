@@ -28,6 +28,10 @@ Segue abaixo body de requisição ao serviço :
 
 ![img_1.png](img_1.png)
 
+Segue abaixo desenho técnico da solução proposta : 
+
+![img_2.png](img_2.png)
+
 
 	
 
